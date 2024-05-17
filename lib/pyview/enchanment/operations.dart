@@ -17,6 +17,11 @@ class ContrastOperation implements IImageOperation {
     }
     return contrasted;
   }
+
+  @override
+  String toString() {
+    return "Apply Contrast with $contrast";
+  }
 }
 
 class HistogramEqualizationOperation implements IImageOperation {
@@ -31,7 +36,7 @@ class HistogramEqualizationOperation implements IImageOperation {
       redHistogram[pixel.r.toInt()]++;
       greenHistogram[pixel.g.toInt()]++;
       blueHistogram[pixel.b.toInt()]++;
-    }    
+    }
 
     List<int> redCumulative = List.filled(256, 0);
     List<int> greenCumulative = List.filled(256, 0);
@@ -40,7 +45,6 @@ class HistogramEqualizationOperation implements IImageOperation {
     redCumulative[0] = redHistogram[0];
     greenCumulative[0] = greenHistogram[0];
     blueCumulative[0] = blueHistogram[0];
-
 
     for (int i = 1; i < 256; i++) {
       redCumulative[i] = redCumulative[i - 1] + redHistogram[i];
@@ -53,9 +57,12 @@ class HistogramEqualizationOperation implements IImageOperation {
     List<int> normalizedBlue = List.filled(256, 0);
 
     for (int i = 0; i < 256; i++) {
-      normalizedRed[i] = (redCumulative[i] * 255 / (image.width * image.height)).toInt();
-      normalizedGreen[i] = (greenCumulative[i] * 255 / (image.width * image.height)).toInt();
-      normalizedBlue[i] = (blueCumulative[i] * 255 / (image.width * image.height)).toInt();
+      normalizedRed[i] =
+          (redCumulative[i] * 255 / (image.width * image.height)).toInt();
+      normalizedGreen[i] =
+          (greenCumulative[i] * 255 / (image.width * image.height)).toInt();
+      normalizedBlue[i] =
+          (blueCumulative[i] * 255 / (image.width * image.height)).toInt();
     }
 
     for (var pixel in image) {
@@ -67,10 +74,14 @@ class HistogramEqualizationOperation implements IImageOperation {
 
     return equalized;
   }
+
+  @override
+  String toString() {
+    return "Apply Histogram Equalization";
+  }
 }
 
-class HistogramStretchingOperation implements IImageOperation{
-
+class HistogramStretchingOperation implements IImageOperation {
   @override
   PyImage execute(PyImage image) {
     PyImage? stretched = PyImage(width: image.width, height: image.height);
@@ -98,5 +109,10 @@ class HistogramStretchingOperation implements IImageOperation{
     }
 
     return stretched;
+  }
+
+  @override
+  String toString() {
+    return "Apply Histogram Stretching";
   }
 }

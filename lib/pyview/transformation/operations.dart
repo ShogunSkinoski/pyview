@@ -2,9 +2,14 @@ import 'package:pyview/pyview/py_image.dart';
 import 'package:pyview/pyview/image_operation_i.dart';
 import 'package:image/image.dart' as img;
 
-class ConvolutionOperation implements IImageOperation{
+class ConvolutionOperation implements IImageOperation {
   late List<List<double>> kernel;
-  ConvolutionOperation({this.kernel = const [[1, 1, 1], [1, 1, 1], [1, 1, 1]]});
+  ConvolutionOperation(
+      {this.kernel = const [
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1]
+      ]});
 
   @override
   PyImage execute(PyImage image) {
@@ -31,13 +36,26 @@ class ConvolutionOperation implements IImageOperation{
     }
     return convoluted;
   }
+
+  @override
+  String toString() {
+    return "Apply Convolution with {kernel: $kernel}";
+  }
 }
 
-class PrewittOperation implements IImageOperation{
+class PrewittOperation implements IImageOperation {
   @override
   PyImage execute(PyImage image) {
-    List<List<double>> kernelX = [[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]];
-    List<List<double>> kernelY = [[-1, -1, -1], [0, 0, 0], [1, 1, 1]];
+    List<List<double>> kernelX = [
+      [-1, 0, 1],
+      [-1, 0, 1],
+      [-1, 0, 1]
+    ];
+    List<List<double>> kernelY = [
+      [-1, -1, -1],
+      [0, 0, 0],
+      [1, 1, 1]
+    ];
     PyImage? convoluted = PyImage(width: image.width, height: image.height);
     for (var pixel in image) {
       int rX = 0;
@@ -66,5 +84,10 @@ class PrewittOperation implements IImageOperation{
       convoluted.setPixel(pixel.x, pixel.y, img.ColorRgb8(r, g, b));
     }
     return convoluted;
-}
+  }
+
+  @override
+  String toString() {
+    return "Apply Prewitt Operation";
+  }
 }
