@@ -5,6 +5,13 @@ import 'package:pyview/pyview/image_operation_i.dart';
 import 'package:flutter_gemini/src/models/candidates/candidates.dart';
 
 class CodeConverter {
+  Map<String, String> codeMap = {
+    "python": "```python",
+    "dart": "```dart",
+    "java": "```java",
+    "c": "```c",
+    "cpp": "```cpp",
+  };
   late final geminiInstance;
   CodeConverter(String apiKey) {
     Gemini.init(apiKey: apiKey);

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:pyview/ui/home_page.dart';
 
 Future<void> main() async {
-  String apiKey = "AIzaSyBcuMK_su_aMuoCP8jjI-lAaNiykyappNU";
-
   runApp(MyApp());
 }
 

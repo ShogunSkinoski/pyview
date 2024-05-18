@@ -6,6 +6,7 @@ import 'package:filepicker_windows/filepicker_windows.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pyview/gemini/code_converter.dart';
 import 'package:pyview/pyview/basic/operations.dart';
 import 'package:pyview/pyview/enchanment/operations.dart';
 import 'package:pyview/pyview/image_operation_i.dart';
@@ -14,6 +15,7 @@ import 'package:pyview/pyview/noise/operations.dart';
 import 'package:pyview/pyview/py_image.dart';
 import 'package:image/image.dart' as img;
 import 'package:pyview/pyview/transformation/operations.dart';
+import 'package:pyview/pyview/utility/operations.dart';
 import 'package:pyview/ui/image_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:async';
@@ -28,6 +30,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  CodeConverter codeConverter =
+      CodeConverter("AIzaSyBcuMK_su_aMuoCP8jjI-lAaNiykyappNU");
+
   FileImage? inputImage;
   MemoryImage? outputImage;
   Map<String, IImageOperation> operations = {};
@@ -83,6 +88,64 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   actions: [
+                    TextButton(
+                      child: Text('Clear All'),
+                      onPressed: () {
+                        setState(() {
+                          operations.clear();
+                        });
+                        Navigator.of(context).pop();
+                        _applyOperations();
+                      },
+                    ),
+                    TextButton(
+                      child: Text("Convert to Code"),
+                      onPressed: () {
+                        String language = "";
+                        //select language from dropdown and save to desired path selected
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Select Language"),
+                                content: Container(
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  height:
+                                      MediaQuery.of(context).size.height / 2,
+                                  child: Column(
+                                    children: [
+                                      DropdownButton<String>(
+                                        value: "python",
+                                        items: <String>[
+                                          'python',
+                                          'java',
+                                          'cpp',
+                                          'c'
+                                        ].map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? value) {
+                                          //save language to code converter
+                                          language = value!;
+                                        },
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          //save code to desired path
+                                          //select path with file picker
+                                        },
+                                        child: Text("Save Code"),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                    ),
                     TextButton(
                       child: Text('Close'),
                       onPressed: () {
@@ -459,9 +522,13 @@ class _HomePageState extends State<HomePage> {
 
   _utilityOperationPanel() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         _operationButton("➕", "Add Image", () {
           _addImageOperation();
+        }),
+        _operationButton("➗", "Divide Image", () {
+          _divideImageOperation();
         })
       ],
     );
@@ -769,6 +836,52 @@ class _HomePageState extends State<HomePage> {
   void _medianFilterOperation() {
     operations["medianFilter"] = MedianFilter();
     _applyOperations();
+  }
+
+  void _addImageOperation() async {
+    final file = OpenFilePicker()
+      ..filterSpecification = {
+        'Images (*.jpg, *.jpeg, *.png)': '*.jpg;*.jpeg;*.png',
+      }
+      ..defaultFilterIndex = 0
+      ..defaultExtension = 'jpg'
+      ..title = 'Select an image';
+
+    final result = file.getFile();
+    if (result != null) {
+      final bytes = File(result.path).readAsBytesSync();
+      PyImage? firstImage = await decodePyImageBytes(bytes);
+      if (firstImage == null) return;
+      setState(() {
+        operations["addImage"] = AddOperation(
+          firstImage: firstImage!,
+        );
+        _applyOperations();
+      });
+    }
+  }
+
+  void _divideImageOperation() async {
+    final file = OpenFilePicker()
+      ..filterSpecification = {
+        'Images (*.jpg, *.jpeg, *.png)': '*.jpg;*.jpeg;*.png',
+      }
+      ..defaultFilterIndex = 0
+      ..defaultExtension = 'jpg'
+      ..title = 'Select an image';
+
+    final result = file.getFile();
+    if (result != null) {
+      final bytes = File(result.path).readAsBytesSync();
+      PyImage? firstImage = await decodePyImageBytes(bytes);
+      if (firstImage == null) return;
+      setState(() {
+        operations["divideImage"] = DivideImage(
+          firstImage: firstImage!,
+        );
+        _applyOperations();
+      });
+    }
   }
 }
 
