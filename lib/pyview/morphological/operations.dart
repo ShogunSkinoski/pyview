@@ -6,7 +6,12 @@ import 'package:image/image.dart' as img;
 
 class DilationOperation implements IImageOperation {
   late List<List<int>> kernel;
-  DilationOperation({required this.kernel});
+  DilationOperation(
+      {this.kernel = const [
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 1, 0]
+      ]});
   @override
   PyImage execute(PyImage image) {
     int width = image.width;
@@ -14,16 +19,16 @@ class DilationOperation implements IImageOperation {
 
     PyImage dilateImage = PyImage(width: width, height: height);
 
-    for (int i = 0; i < image.height; i++) {
-      for (int j = 0; j < image.width; j++) {
+    for (int i = 0; i < image.width; i++) {
+      for (int j = 0; j < image.height; j++) {
         int maxRedPixel = 0;
         int maxGreenPixel = 0;
         int maxBluePixel = 0;
         for (int k = 0; k < kernel.length; k++) {
           for (int l = 0; l < kernel[k].length; l++) {
-            int x = i + k - kernel.length ~/ 2;
-            int y = j + l - kernel[k].length ~/ 2;
-            if (x >= 0 && x < height && y >= 0 && y < width) {
+            int x = i + l - kernel.length ~/ 2;
+            int y = j + k - kernel[k].length ~/ 2;
+            if (x >= 0 && x < width && y >= 0 && y < height) {
               int redPixel = image.getPixel(x, y).r.toInt();
               int greenPixel = image.getPixel(x, y).g.toInt();
               int bluePixel = image.getPixel(x, y).b.toInt();
@@ -61,8 +66,8 @@ class ErosionOperation implements IImageOperation {
 
     PyImage erodeImage = PyImage(width: width, height: height);
 
-    for (int i = 0; i < image.height; i++) {
-      for (int j = 0; j < image.width; j++) {
+    for (int i = 0; i < image.width; i++) {
+      for (int j = 0; j < image.height; j++) {
         int minRedPixel = 255;
         int minGreenPixel = 255;
         int minBluePixel = 255;
@@ -70,7 +75,7 @@ class ErosionOperation implements IImageOperation {
           for (int l = 0; l < kernel[k].length; l++) {
             int x = i + k - kernel.length ~/ 2;
             int y = j + l - kernel[k].length ~/ 2;
-            if (x >= 0 && x < height && y >= 0 && y < width) {
+            if (x >= 0 && x < width && y >= 0 && y < height) {
               int redPixel = image.getPixel(x, y).r.toInt();
               int greenPixel = image.getPixel(x, y).g.toInt();
               int bluePixel = image.getPixel(x, y).b.toInt();
