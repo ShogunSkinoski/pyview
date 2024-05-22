@@ -40,6 +40,8 @@ class _HomePageState extends State<HomePage> {
   Timer? _debounce;
   double whiteProbablity = 0.05;
   double blackProbablity = 0.05;
+  String language = "";
+  int zoom = 0;
 
   @override
   void dispose() {
@@ -96,54 +98,6 @@ class _HomePageState extends State<HomePage> {
                         });
                         Navigator.of(context).pop();
                         _applyOperations();
-                      },
-                    ),
-                    TextButton(
-                      child: Text("Convert to Code"),
-                      onPressed: () {
-                        String language = "";
-                        //select language from dropdown and save to desired path selected
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text("Select Language"),
-                                content: Container(
-                                  width: MediaQuery.of(context).size.width / 2,
-                                  height:
-                                      MediaQuery.of(context).size.height / 2,
-                                  child: Column(
-                                    children: [
-                                      DropdownButton<String>(
-                                        value: "python",
-                                        items: <String>[
-                                          'python',
-                                          'java',
-                                          'cpp',
-                                          'c'
-                                        ].map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? value) {
-                                          //save language to code converter
-                                          language = value!;
-                                        },
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          //save code to desired path
-                                          //select path with file picker
-                                        },
-                                        child: Text("Save Code"),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
                       },
                     ),
                     TextButton(
@@ -319,6 +273,38 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Column _sliderZoom(IconData icon, String text, Function(double) onChanged) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 36,
+            ),
+            Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
+            ),
+            Slider(
+              min: 0,
+              max: 10,
+              value: zoom.toDouble(),
+              onChanged: onChanged,
+            ),
+            Text("${zoom.toInt()}",
+                style: const TextStyle(color: Colors.white)),
+          ],
+        ),
+      ],
+    );
+  }
+
   Row _operationButton(String icon, String text, Function() onPressed) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -371,6 +357,20 @@ class _HomePageState extends State<HomePage> {
             operations["rotate"] = RotateOperation(angle: value.ceilToDouble());
             setState(() {
               angle = value.ceilToDouble();
+            });
+            _debounce?.cancel();
+            _debounce = Timer(Duration(milliseconds: 300), () {
+              _applyOperations();
+            });
+          },
+        ),
+        _sliderZoom(
+          Icons.zoom_in,
+          "Zoom",
+          (value) async {
+            operations["zoom"] = ZoomOperation(scale: value.toInt());
+            setState(() {
+              zoom = value.toInt();
             });
             _debounce?.cancel();
             _debounce = Timer(Duration(milliseconds: 300), () {
@@ -529,7 +529,19 @@ class _HomePageState extends State<HomePage> {
         }),
         _operationButton("➗", "Divide Image", () {
           _divideImageOperation();
-        })
+        }),
+        _operationButton("🔷", "HSV Color Transformation", () {
+          operations["hsv"] = HSVOperation();
+          _applyOperations();
+        }),
+        _operationButton("🚀", "YCbCr Color Transformation", () {
+          operations["YCbCr"] = YCbCrOperation();
+          _applyOperations();
+        }),
+        _operationButton("🇨", "CMYO Color Transformation", () {
+          operations["CMYO"] = CMYOOperation();
+          _applyOperations();
+        }),
       ],
     );
   }

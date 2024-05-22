@@ -75,15 +75,15 @@ class CropOperation implements IImageOperation {
 }
 
 class ZoomOperation implements IImageOperation {
-  late int centerX;
-  late int centerY;
   late int scale;
-  ZoomOperation(
-      {required this.centerX, required this.centerY, required this.scale});
+  int? centerX;
+  int? centerY;
+  ZoomOperation({required this.scale});
   @override
   PyImage execute(PyImage image) {
     if (scale <= 1) return image;
-
+    int centerX = image.width ~/ 2;
+    int centerY = image.height ~/ 2;
     PyImage? zoomed = PyImage(width: image.width, height: image.width);
 
     int cropX =
